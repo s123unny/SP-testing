@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
 		path[len+1] = '\0';
 		
 		strcpy(sdir+len3, path+8);
-		printf("file: %s %s\n:", path, sdir);
+		printf("file: %s %s\n", path, sdir);
 		lstat(path, &statbuf1);
 		lstat(sdir, &statbuf2);
 		if (statbuf2.st_mode != statbuf1.st_mode) {
@@ -104,17 +104,26 @@ int main(int argc, char const *argv[])
 		printf("hardlink ok\n");
 	}
 	//symlink("xxx", "../cdir/s_link2");
+	ok = 1;
 	lstat("../sdir/user/s_link2", &statbuf1);
 	if (!S_ISLNK(statbuf1.st_mode)) {
-		printf("softlink1 wrong\n");
+		printf("softlink type wrong\n");
+		ok = 0;
 	}
 	//symlink("dir1/file2", "../cdir/s_link");
 	stat("../sdir/user/dir1/file2", &statbuf1);
 	stat("../sdir/user/s_link", &statbuf2);
 	if (statbuf2.st_ino != statbuf1.st_ino) {
-		printf("softlink2 wrong!\n");
-	} else {
-		printf("softlink2 ok\n");
+		printf("softlink point wrong!\n");
+	}
+	lstat("../cdir/s_link", &statbuf1);
+	lstat("../sdir/user/s_link", &statbuf2);
+	if (statbuf1.st_atime != statbuf2.st_atime || statbuf1.st_mtime != statbuf2.st_mtime) {
+		printf("   time wrong!\n");
+		ok = 0;
+	}
+	if (ok) {
+		printf("softlink ok\n");
 	}
 	return 0;
 }
